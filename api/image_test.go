@@ -22,24 +22,3 @@ func randomImage(t *testing.T, product db.Product, image string) db.Image {
 		Product:   product.ID,
 	}
 }
-
-func TestUploadImageApi(t *testing.T) {
-	/*
-		user, _ := randomUser(t)
-		product := randomProduct(user)
-		randomImage(t, product, "image_test.jpg")
-
-		testCases := []struct {
-			name          string
-			body          gin.H
-			product_id    uuid.UUID
-			buildStubs    func(store *mockdb.MockStore)
-			checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
-		}{
-			{
-				name: "OK",
-				body: ,
-			},
-		}
-	*/
-}

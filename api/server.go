@@ -8,6 +8,8 @@ import (
 	"github.com/Yelsnik/e-commerce-api/token"
 	"github.com/Yelsnik/e-commerce-api/util"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Server struct {
@@ -30,9 +32,16 @@ func (server *Server) setUpRouter() {
 
 	roles := []string{"merchant", "admin"}
 
-	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker), roleBasedMiddleware(roles))
+	authRoutesWithRole := router.Group("/").Use(authMiddleware(server.tokenMaker), roleBasedMiddleware(roles))
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
-	authRoutes.POST("/v1/product", server.createProduct)
+	authRoutesWithRole.POST("/v1/product", server.createProduct)
+
+	authRoutes.POST("/v1/add-to-cart/:id", server.addToCartApi)
+	authRoutes.PATCH("/v1/update-cart/:id", server.updateCartApi)
+	authRoutes.GET("/v1/carts", server.getAllCartsApi)
+	authRoutes.POST("/v1/remove-cart-item/:id", server.removeCartItemApi)
+
 	router.GET("/v1/product/:id", server.getProduct)
 	router.POST("/v1/images/:pid", server.uploadImage)
 	router.GET("/v1/products", server.listProduct)
@@ -53,6 +62,10 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		config:     config,
 		tokenMaker: tokenMaker,
 		store:      store,
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", validCurrency)
 	}
 
 	server.setUpRouter()

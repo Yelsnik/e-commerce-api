@@ -20,12 +20,13 @@ INSERT INTO products (
   brand,
   count_in_stock,
   price,
+  currency,
   rating,
   is_featured,
   user_id
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9
-) RETURNING id, category, product_name, description, brand, count_in_stock, price, rating, is_featured, user_id, created_at
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+) RETURNING id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at
 `
 
 type CreateProductsParams struct {
@@ -35,6 +36,7 @@ type CreateProductsParams struct {
 	Brand        sql.NullString `json:"brand"`
 	CountInStock int64          `json:"count_in_stock"`
 	Price        float64        `json:"price"`
+	Currency     string         `json:"currency"`
 	Rating       sql.NullInt64  `json:"rating"`
 	IsFeatured   sql.NullBool   `json:"is_featured"`
 	UserID       uuid.UUID      `json:"user_id"`
@@ -48,6 +50,7 @@ func (q *Queries) CreateProducts(ctx context.Context, arg CreateProductsParams) 
 		arg.Brand,
 		arg.CountInStock,
 		arg.Price,
+		arg.Currency,
 		arg.Rating,
 		arg.IsFeatured,
 		arg.UserID,
@@ -61,6 +64,7 @@ func (q *Queries) CreateProducts(ctx context.Context, arg CreateProductsParams) 
 		&i.Brand,
 		&i.CountInStock,
 		&i.Price,
+		&i.Currency,
 		&i.Rating,
 		&i.IsFeatured,
 		&i.UserID,
@@ -80,7 +84,7 @@ func (q *Queries) DeleteProducts(ctx context.Context, id uuid.UUID) error {
 }
 
 const getProducts = `-- name: GetProducts :one
-SELECT id, category, product_name, description, brand, count_in_stock, price, rating, is_featured, user_id, created_at FROM products
+SELECT id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at FROM products
 WHERE id = $1 LIMIT 1
 `
 
@@ -95,6 +99,7 @@ func (q *Queries) GetProducts(ctx context.Context, id uuid.UUID) (Product, error
 		&i.Brand,
 		&i.CountInStock,
 		&i.Price,
+		&i.Currency,
 		&i.Rating,
 		&i.IsFeatured,
 		&i.UserID,
@@ -104,7 +109,7 @@ func (q *Queries) GetProducts(ctx context.Context, id uuid.UUID) (Product, error
 }
 
 const listProducts = `-- name: ListProducts :many
-SELECT id, category, product_name, description, brand, count_in_stock, price, rating, is_featured, user_id, created_at FROM products
+SELECT id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at FROM products
 ORDER BY  id
 LIMIT $1
 OFFSET $2
@@ -132,6 +137,7 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]P
 			&i.Brand,
 			&i.CountInStock,
 			&i.Price,
+			&i.Currency,
 			&i.Rating,
 			&i.IsFeatured,
 			&i.UserID,
@@ -161,7 +167,7 @@ UPDATE products
   rating = $8,
   is_featured = $9
 WHERE id = $1
-RETURNING id, category, product_name, description, brand, count_in_stock, price, rating, is_featured, user_id, created_at
+RETURNING id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at
 `
 
 type UpdateProductsParams struct {
@@ -197,6 +203,7 @@ func (q *Queries) UpdateProducts(ctx context.Context, arg UpdateProductsParams) 
 		&i.Brand,
 		&i.CountInStock,
 		&i.Price,
+		&i.Currency,
 		&i.Rating,
 		&i.IsFeatured,
 		&i.UserID,

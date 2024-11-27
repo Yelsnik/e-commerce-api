@@ -100,3 +100,15 @@ func (server *Server) uploadImage(ctx *gin.Context) {
 
 	success(ctx, response)
 }
+
+type getImageRequest struct {
+	ProductID string `uri:"pid" binding:"required"`
+}
+
+func (server *Server) getImage(ctx *gin.Context) {
+	var req getImageRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+}

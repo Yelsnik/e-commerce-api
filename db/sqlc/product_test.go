@@ -17,6 +17,7 @@ func createNewProduct(t *testing.T) Product {
 		Brand:        util.NewNullString(util.RandomString(6)),
 		CountInStock: util.RandomInt(0, 9),
 		Price:        float64(util.RandomMoney()),
+		Currency:     util.RandomCurrency(),
 		Rating:       util.NewNullInt(util.RandomInt(0, 5)),
 		UserID:       user.ID,
 	}
@@ -31,6 +32,7 @@ func createNewProduct(t *testing.T) Product {
 	require.Equal(t, arg.Brand, product.Brand)
 	require.Equal(t, arg.CountInStock, product.CountInStock)
 	require.Equal(t, arg.Price, product.Price)
+	require.Equal(t, arg.Currency, product.Currency)
 	require.Equal(t, arg.Rating, product.Rating)
 	require.Equal(t, arg.UserID, product.UserID)
 
@@ -54,6 +56,7 @@ func TestGetProduct(t *testing.T) {
 	require.Equal(t, product.Brand, p.Brand)
 	require.Equal(t, product.CountInStock, p.CountInStock)
 	require.Equal(t, product.Price, p.Price)
+	require.Equal(t, product.Currency, p.Currency)
 	require.Equal(t, product.Rating, p.Rating)
 }
 

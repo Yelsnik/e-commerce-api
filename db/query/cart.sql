@@ -6,9 +6,18 @@ INSERT INTO carts (
 )
 RETURNING *;
 
+-- name: GetCartsByUserID :one
+SELECT * FROM carts
+WHERE user_id = $1 LIMIT 1;
+
 -- name: GetCarts :one
 SELECT * FROM carts
 WHERE id = $1 LIMIT 1;
+
+-- name: GetCartsForUpdate :one
+SELECT * FROM carts
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE;
 
 -- name: UpdateCarts :one
 UPDATE carts

@@ -11,13 +11,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const addSubtotalPrice = `-- name: AddSubtotalPrice :one
+SELECT COALESCE(SUM(sub_total), 0)::float AS total
+FROM cartitems
+WHERE cart = $1
+`
+
+func (q *Queries) AddSubtotalPrice(ctx context.Context, cart uuid.UUID) (float64, error) {
+	row := q.db.QueryRowContext(ctx, addSubtotalPrice, cart)
+	var total float64
+	err := row.Scan(&total)
+	return total, err
+}
+
 const createCartitems = `-- name: CreateCartitems :one
 INSERT INTO cartitems (
-  cart, product, quantity, price, sub_total
+  cart, product, quantity, price, currency, sub_total
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
-RETURNING id, cart, product, quantity, price, sub_total, created_at
+RETURNING id, cart, product, quantity, price, currency, sub_total, created_at
 `
 
 type CreateCartitemsParams struct {
@@ -25,6 +38,7 @@ type CreateCartitemsParams struct {
 	Product  uuid.UUID `json:"product"`
 	Quantity int64     `json:"quantity"`
 	Price    float64   `json:"price"`
+	Currency string    `json:"currency"`
 	SubTotal float64   `json:"sub_total"`
 }
 
@@ -34,6 +48,7 @@ func (q *Queries) CreateCartitems(ctx context.Context, arg CreateCartitemsParams
 		arg.Product,
 		arg.Quantity,
 		arg.Price,
+		arg.Currency,
 		arg.SubTotal,
 	)
 	var i Cartitem
@@ -43,14 +58,98 @@ func (q *Queries) CreateCartitems(ctx context.Context, arg CreateCartitemsParams
 		&i.Product,
 		&i.Quantity,
 		&i.Price,
+		&i.Currency,
 		&i.SubTotal,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
+const deleteCartitems = `-- name: DeleteCartitems :exec
+DELETE FROM cartitems
+WHERE id = $1
+`
+
+func (q *Queries) DeleteCartitems(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteCartitems, id)
+	return err
+}
+
+const getALLCartitemsForUpdate = `-- name: GetALLCartitemsForUpdate :many
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetALLCartitemsForUpdate(ctx context.Context) ([]Cartitem, error) {
+	rows, err := q.db.QueryContext(ctx, getALLCartitemsForUpdate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Cartitem
+	for rows.Next() {
+		var i Cartitem
+		if err := rows.Scan(
+			&i.ID,
+			&i.Cart,
+			&i.Product,
+			&i.Quantity,
+			&i.Price,
+			&i.Currency,
+			&i.SubTotal,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllCartitems = `-- name: GetAllCartitems :many
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
+`
+
+func (q *Queries) GetAllCartitems(ctx context.Context) ([]Cartitem, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCartitems)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Cartitem
+	for rows.Next() {
+		var i Cartitem
+		if err := rows.Scan(
+			&i.ID,
+			&i.Cart,
+			&i.Product,
+			&i.Quantity,
+			&i.Price,
+			&i.Currency,
+			&i.SubTotal,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCartitems = `-- name: GetCartitems :one
-SELECT id, cart, product, quantity, price, sub_total, created_at FROM cartitems
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
 WHERE id = $1 LIMIT 1
 `
 
@@ -63,6 +162,88 @@ func (q *Queries) GetCartitems(ctx context.Context, id uuid.UUID) (Cartitem, err
 		&i.Product,
 		&i.Quantity,
 		&i.Price,
+		&i.Currency,
+		&i.SubTotal,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getCartitemsByCartID = `-- name: GetCartitemsByCartID :many
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
+WHERE cart = $1 
+ORDER BY cart
+`
+
+func (q *Queries) GetCartitemsByCartID(ctx context.Context, cart uuid.UUID) ([]Cartitem, error) {
+	rows, err := q.db.QueryContext(ctx, getCartitemsByCartID, cart)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Cartitem
+	for rows.Next() {
+		var i Cartitem
+		if err := rows.Scan(
+			&i.ID,
+			&i.Cart,
+			&i.Product,
+			&i.Quantity,
+			&i.Price,
+			&i.Currency,
+			&i.SubTotal,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCartitemsByProductID = `-- name: GetCartitemsByProductID :one
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
+WHERE product = $1 LIMIT 1
+`
+
+func (q *Queries) GetCartitemsByProductID(ctx context.Context, product uuid.UUID) (Cartitem, error) {
+	row := q.db.QueryRowContext(ctx, getCartitemsByProductID, product)
+	var i Cartitem
+	err := row.Scan(
+		&i.ID,
+		&i.Cart,
+		&i.Product,
+		&i.Quantity,
+		&i.Price,
+		&i.Currency,
+		&i.SubTotal,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getCartitemsForUpdate = `-- name: GetCartitemsForUpdate :one
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
+WHERE id = $1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetCartitemsForUpdate(ctx context.Context, id uuid.UUID) (Cartitem, error) {
+	row := q.db.QueryRowContext(ctx, getCartitemsForUpdate, id)
+	var i Cartitem
+	err := row.Scan(
+		&i.ID,
+		&i.Cart,
+		&i.Product,
+		&i.Quantity,
+		&i.Price,
+		&i.Currency,
 		&i.SubTotal,
 		&i.CreatedAt,
 	)
@@ -70,7 +251,7 @@ func (q *Queries) GetCartitems(ctx context.Context, id uuid.UUID) (Cartitem, err
 }
 
 const listCartitems = `-- name: ListCartitems :many
-SELECT id, cart, product, quantity, price, sub_total, created_at FROM cartitems
+SELECT id, cart, product, quantity, price, currency, sub_total, created_at FROM cartitems
 ORDER BY  id
 LIMIT $1
 OFFSET $2
@@ -96,6 +277,7 @@ func (q *Queries) ListCartitems(ctx context.Context, arg ListCartitemsParams) ([
 			&i.Product,
 			&i.Quantity,
 			&i.Price,
+			&i.Currency,
 			&i.SubTotal,
 			&i.CreatedAt,
 		); err != nil {
@@ -115,26 +297,19 @@ func (q *Queries) ListCartitems(ctx context.Context, arg ListCartitemsParams) ([
 const updateCartitems = `-- name: UpdateCartitems :one
 UPDATE cartitems
   set quantity = $2,
-  price = $3,
-  sub_total = $4
+  sub_total = $3
 WHERE id = $1
-RETURNING id, cart, product, quantity, price, sub_total, created_at
+RETURNING id, cart, product, quantity, price, currency, sub_total, created_at
 `
 
 type UpdateCartitemsParams struct {
 	ID       uuid.UUID `json:"id"`
 	Quantity int64     `json:"quantity"`
-	Price    float64   `json:"price"`
 	SubTotal float64   `json:"sub_total"`
 }
 
 func (q *Queries) UpdateCartitems(ctx context.Context, arg UpdateCartitemsParams) (Cartitem, error) {
-	row := q.db.QueryRowContext(ctx, updateCartitems,
-		arg.ID,
-		arg.Quantity,
-		arg.Price,
-		arg.SubTotal,
-	)
+	row := q.db.QueryRowContext(ctx, updateCartitems, arg.ID, arg.Quantity, arg.SubTotal)
 	var i Cartitem
 	err := row.Scan(
 		&i.ID,
@@ -142,6 +317,7 @@ func (q *Queries) UpdateCartitems(ctx context.Context, arg UpdateCartitemsParams
 		&i.Product,
 		&i.Quantity,
 		&i.Price,
+		&i.Currency,
 		&i.SubTotal,
 		&i.CreatedAt,
 	)

@@ -11,14 +11,23 @@ import (
 )
 
 type Querier interface {
+	AddSubtotalPrice(ctx context.Context, cart uuid.UUID) (float64, error)
 	CreateCartitems(ctx context.Context, arg CreateCartitemsParams) (Cartitem, error)
 	CreateCarts(ctx context.Context, arg CreateCartsParams) (Cart, error)
 	CreateImages(ctx context.Context, arg CreateImagesParams) (Image, error)
 	CreateProducts(ctx context.Context, arg CreateProductsParams) (Product, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteCartitems(ctx context.Context, id uuid.UUID) error
 	DeleteProducts(ctx context.Context, id uuid.UUID) error
+	GetALLCartitemsForUpdate(ctx context.Context) ([]Cartitem, error)
+	GetAllCartitems(ctx context.Context) ([]Cartitem, error)
 	GetCartitems(ctx context.Context, id uuid.UUID) (Cartitem, error)
+	GetCartitemsByCartID(ctx context.Context, cart uuid.UUID) ([]Cartitem, error)
+	GetCartitemsByProductID(ctx context.Context, product uuid.UUID) (Cartitem, error)
+	GetCartitemsForUpdate(ctx context.Context, id uuid.UUID) (Cartitem, error)
 	GetCarts(ctx context.Context, id uuid.UUID) (Cart, error)
+	GetCartsByUserID(ctx context.Context, userID uuid.UUID) (Cart, error)
+	GetCartsForUpdate(ctx context.Context, id uuid.UUID) (Cart, error)
 	GetImages(ctx context.Context, product uuid.UUID) (Image, error)
 	GetProducts(ctx context.Context, id uuid.UUID) (Product, error)
 	GetUser(ctx context.Context, id uuid.UUID) (User, error)

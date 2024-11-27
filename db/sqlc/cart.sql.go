@@ -44,6 +44,31 @@ func (q *Queries) GetCarts(ctx context.Context, id uuid.UUID) (Cart, error) {
 	return i, err
 }
 
+const getCartsByUserID = `-- name: GetCartsByUserID :one
+SELECT id, user_id, total_price FROM carts
+WHERE user_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetCartsByUserID(ctx context.Context, userID uuid.UUID) (Cart, error) {
+	row := q.db.QueryRowContext(ctx, getCartsByUserID, userID)
+	var i Cart
+	err := row.Scan(&i.ID, &i.UserID, &i.TotalPrice)
+	return i, err
+}
+
+const getCartsForUpdate = `-- name: GetCartsForUpdate :one
+SELECT id, user_id, total_price FROM carts
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetCartsForUpdate(ctx context.Context, id uuid.UUID) (Cart, error) {
+	row := q.db.QueryRowContext(ctx, getCartsForUpdate, id)
+	var i Cart
+	err := row.Scan(&i.ID, &i.UserID, &i.TotalPrice)
+	return i, err
+}
+
 const updateCarts = `-- name: UpdateCarts :one
 UPDATE carts
   set total_price = $2

@@ -24,6 +24,7 @@ type Cartitem struct {
 	Quantity int64     `json:"quantity"`
 	// must be positive
 	Price     float64   `json:"price"`
+	Currency  string    `json:"currency"`
 	SubTotal  float64   `json:"sub_total"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -45,6 +46,7 @@ type Product struct {
 	CountInStock int64          `json:"count_in_stock"`
 	// must be positive
 	Price      float64       `json:"price"`
+	Currency   string        `json:"currency"`
 	Rating     sql.NullInt64 `json:"rating"`
 	IsFeatured sql.NullBool  `json:"is_featured"`
 	UserID     uuid.UUID     `json:"user_id"`

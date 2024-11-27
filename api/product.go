@@ -18,6 +18,7 @@ type createProductRequest struct {
 	Brand        string  `json:"brand"`
 	CountInStock int64   `json:"count_in_stock" binding:"required"`
 	Price        float64 `json:"price" binding:"required"`
+	Currency     string  `json:"currency" binding:"required,currency"`
 }
 
 type ProductResponse struct {
@@ -48,6 +49,7 @@ func (server *Server) createProduct(ctx *gin.Context) {
 		Brand:        util.NewNullString(req.Brand),
 		CountInStock: req.CountInStock,
 		Price:        req.Price,
+		Currency:     req.Currency,
 		UserID:       authPayload.User_ID,
 	}
 

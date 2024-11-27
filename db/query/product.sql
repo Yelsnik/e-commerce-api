@@ -6,11 +6,12 @@ INSERT INTO products (
   brand,
   count_in_stock,
   price,
+  currency,
   rating,
   is_featured,
   user_id
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 ) RETURNING *;
 
 -- name: GetProducts :one

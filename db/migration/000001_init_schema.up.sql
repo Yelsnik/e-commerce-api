@@ -17,6 +17,7 @@ CREATE TABLE "products" (
   "brand" varchar,
   "count_in_stock" bigint NOT NULL,
   "price" float NOT NULL,
+  "currency" varchar NOT NULL,
   "rating" bigint,
   "is_featured" bool DEFAULT false,
   "user_id" uuid NOT NULL,
@@ -33,10 +34,11 @@ CREATE TABLE "images" (
 
 CREATE TABLE "cartitems" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "cart" uuid NOT NULL,
-  "product" uuid NOT NULL,
+  "cart" uuid  NOT NULL,
+  "product" uuid  NOT NULL,
   "quantity" bigint NOT NULL,
   "price" float NOT NULL,
+  "currency" varchar NOT NULL,
   "sub_total" float NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
@@ -45,6 +47,37 @@ CREATE TABLE "carts" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "user_id" uuid NOT NULL,
   "total_price" float NOT NULL
+);
+
+CREATE TABLE "orders" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_name" varchar NOT NULL,
+  "user_id" uuid NOT NULL,
+  "total_price" float NOT NULL,
+  "delivery_address" varchar NOT NULL,
+  "country" varchar NOT NULL,
+  "status" varchar NOT NULL DEFAULT 'processing',
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "orderitems" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "item_name" varchar NOT NULL,
+  "item_sub_total" float NOT NULL,
+  "quantity" bigint NOT NULL,
+  "item_id" uuid NOT NULL,
+  "order" uuid NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "payments" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "amount" float NOT NULL,
+  "currency" varchar NOT NULL,
+  "payment_method" varchar NOT NULL,
+  "status" bool NOT NULL DEFAULT 'processing',
+  "user_id" uuid NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE INDEX ON "users" ("email");
@@ -67,3 +100,10 @@ ALTER TABLE "cartitems" ADD FOREIGN KEY ("product") REFERENCES "products" ("id")
 
 ALTER TABLE "carts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
+ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "orderitems" ADD FOREIGN KEY ("item_id") REFERENCES "products" ("id");
+
+ALTER TABLE "orderitems" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
+
+ALTER TABLE "payments" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
