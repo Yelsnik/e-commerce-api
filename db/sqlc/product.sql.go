@@ -83,6 +83,32 @@ func (q *Queries) DeleteProducts(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getProductForUpdate = `-- name: GetProductForUpdate :one
+SELECT id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at FROM products
+WHERE id = $1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetProductForUpdate(ctx context.Context, id uuid.UUID) (Product, error) {
+	row := q.db.QueryRowContext(ctx, getProductForUpdate, id)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Category,
+		&i.ProductName,
+		&i.Description,
+		&i.Brand,
+		&i.CountInStock,
+		&i.Price,
+		&i.Currency,
+		&i.Rating,
+		&i.IsFeatured,
+		&i.UserID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getProducts = `-- name: GetProducts :one
 SELECT id, category, product_name, description, brand, count_in_stock, price, currency, rating, is_featured, user_id, created_at FROM products
 WHERE id = $1 LIMIT 1

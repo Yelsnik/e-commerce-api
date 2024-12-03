@@ -6,7 +6,7 @@ INSERT INTO cartitems (
 )
 RETURNING *;
 
--- name: GetCartitems :one
+-- name: GetCartitem :one
 SELECT * FROM cartitems
 WHERE id = $1 LIMIT 1;
 

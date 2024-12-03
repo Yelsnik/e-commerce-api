@@ -42,7 +42,6 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stripe/stripe-go/v72 v72.122.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
@@ -63,6 +62,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/o1egl/paseto v1.0.0
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/stripe/stripe-go/v81 v81.1.0
 	golang.org/x/crypto v0.29.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

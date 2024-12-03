@@ -37,6 +37,36 @@ type Image struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Order struct {
+	ID              uuid.UUID `json:"id"`
+	UserName        string    `json:"user_name"`
+	UserID          uuid.UUID `json:"user_id"`
+	TotalPrice      float64   `json:"total_price"`
+	DeliveryAddress string    `json:"delivery_address"`
+	Country         string    `json:"country"`
+	Status          string    `json:"status"`
+	CreatedAt       time.Time `json:"created_at"`
+}
+
+type Orderitem struct {
+	ID           uuid.UUID `json:"id"`
+	ItemName     string    `json:"item_name"`
+	ItemSubTotal float64   `json:"item_sub_total"`
+	Quantity     int64     `json:"quantity"`
+	ItemID       uuid.UUID `json:"item_id"`
+	OrderID      uuid.UUID `json:"order_id"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type Payment struct {
+	ID        string    `json:"id"`
+	Amount    float64   `json:"amount"`
+	Currency  string    `json:"currency"`
+	Status    string    `json:"status"`
+	UserID    uuid.UUID `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type Product struct {
 	ID           uuid.UUID      `json:"id"`
 	Category     string         `json:"category"`

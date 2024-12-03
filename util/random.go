@@ -55,6 +55,12 @@ func RandomCategory() string {
 	return category[rand.Intn(n)]
 }
 
+func RandomPaymentMethod() string {
+	paymentMethod := []string{"bank transfer", "card"}
+	n := len(paymentMethod)
+	return paymentMethod[rand.Intn(n)]
+}
+
 func NewNullString(s string) sql.NullString {
 	return sql.NullString{String: s, Valid: s != ""}
 }
@@ -94,6 +100,12 @@ func Test() uuid.UUID {
 
 func RandomRole() string {
 	roles := []string{"merchant", "admin", "buyer"}
+	n := len(roles)
+	return roles[rand.Intn(n)]
+}
+
+func RandomCountry() string {
+	roles := []string{"USA", "UK", "Canada", "Nigeria", "Germany"}
 	n := len(roles)
 	return roles[rand.Intn(n)]
 }

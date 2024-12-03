@@ -18,6 +18,11 @@ INSERT INTO products (
 SELECT * FROM products
 WHERE id = $1 LIMIT 1;
 
+-- name: GetProductForUpdate :one
+SELECT * FROM products
+WHERE id = $1
+FOR NO KEY UPDATE;
+
 -- name: ListProducts :many
 SELECT * FROM products
 ORDER BY  id

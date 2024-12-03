@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/stripe/stripe-go/v81"
+
 	"github.com/Yelsnik/e-commerce-api/api"
 	db "github.com/Yelsnik/e-commerce-api/db/sqlc"
 	"github.com/Yelsnik/e-commerce-api/util"
@@ -15,6 +17,8 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
+
+	stripe.Key = config.StripeSecretKey
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 

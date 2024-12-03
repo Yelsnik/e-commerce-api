@@ -13,6 +13,7 @@ type Config struct {
 	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	StripeSecretKey     string        `mapstructure:"STRIPE_SECRET_KEY"`
+	WebhookSigningKey   string        `mapstructure:"WEBHOOK_SIGNING_KEY"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

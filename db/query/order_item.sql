@@ -1,6 +1,6 @@
 -- name: CreateOrderitems :one
 INSERT INTO orderitems (
-  item_name, item_sub_total, quantity, item_id, order
+  item_name, item_sub_total, quantity, item_id, order_id
 ) VALUES (
   $1, $2, $3, $4, $5
 )
@@ -15,11 +15,11 @@ SELECT * FROM orderitems
 WHERE id = $1
 FOR NO KEY UPDATE;
 
--- name: GetOrderitemsByOrderID :one
+-- name: GetOrderitemByOrderID :one
 SELECT * FROM orderitems
-WHERE order = $1 LIMIT 1;
+WHERE order_id = $1 LIMIT 1;
 
 -- name: GetOrderitemsByOrderID :many
 SELECT * FROM orderitems
-WHERE order = $1 
-ORDER BY order;
+WHERE order_id = $1 
+ORDER BY order_id;

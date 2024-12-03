@@ -66,21 +66,18 @@ CREATE TABLE "orderitems" (
   "item_sub_total" float NOT NULL,
   "quantity" bigint NOT NULL,
   "item_id" uuid NOT NULL,
-  "order" uuid NOT NULL,
+  "order_id" uuid NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "payments" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "id" varchar PRIMARY KEY,
   "amount" float NOT NULL,
   "currency" varchar NOT NULL,
-  "payment_method" varchar NOT NULL,
-  "status" bool NOT NULL DEFAULT 'processing',
+  "status" varchar NOT NULL DEFAULT 'processing',
   "user_id" uuid NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
-
-CREATE INDEX ON "users" ("email");
 
 CREATE INDEX ON "products" ("category");
 
@@ -104,6 +101,6 @@ ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "orderitems" ADD FOREIGN KEY ("item_id") REFERENCES "products" ("id");
 
-ALTER TABLE "orderitems" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
+ALTER TABLE "orderitems" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "payments" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
