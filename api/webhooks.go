@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	db "github.com/Yelsnik/e-commerce-api/db/sqlc"
+	"github.com/Yelsnik/e-commerce-api/token"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v81"
@@ -109,6 +110,7 @@ func (server *Server) handlePaymentIfSuccessful(ctx *gin.Context, paymentIntent 
 		DeliveryAddress: paymentIntent.Metadata["deliveryAddress"],
 		Country:         paymentIntent.Metadata["country"],
 		PaymentStatus:   string(paymentIntent.Status),
+		OrderStatus:     "processing",
 	}
 
 	result, err := server.store.CreateOrderTx(ctx, cartItem.Cart, cartItem.ID, arg)
@@ -123,4 +125,40 @@ func (server *Server) handlePaymentIfSuccessful(ctx *gin.Context, paymentIntent 
 	}
 
 	success(ctx, response)
+}
+
+type updateOrderStatusRequest struct {
+	OrderID string `uri:"order_id"`
+	Status  string `json:"status"`
+}
+
+func (server *Server) updateOrderStatus(ctx *gin.Context) {
+	var req updateOrderStatusRequest
+	err := ctx.ShouldBindUri(&req)
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	_ = ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	id, err := uuid.Parse(req.OrderID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateOrdersParams{
+		ID:     id,
+		Status: req.Status,
+	}
+
+	order, err := server.store.UpdateOrders(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	success(ctx, order)
+
 }

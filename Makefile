@@ -13,11 +13,17 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:mahanta@localhost:5432/e_commerce?sslmode=disable" -verbose down
 
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 sqlc:
 	sqlc generate
 
 run:
 	go run main.go
+
+test:
+	go test -v -cover ./...
 
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/Yelsnik/e-commerce-api/db/sqlc Store

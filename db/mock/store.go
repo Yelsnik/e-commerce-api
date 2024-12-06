@@ -156,6 +156,21 @@ func (mr *MockStoreMockRecorder) CreateOrders(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrders", reflect.TypeOf((*MockStore)(nil).CreateOrders), arg0, arg1)
 }
 
+// CreatePasswordResetToken mocks base method.
+func (m *MockStore) CreatePasswordResetToken(arg0 context.Context, arg1 db.CreatePasswordResetTokenParams) (db.PasswordResetToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePasswordResetToken", arg0, arg1)
+	ret0, _ := ret[0].(db.PasswordResetToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePasswordResetToken indicates an expected call of CreatePasswordResetToken.
+func (mr *MockStoreMockRecorder) CreatePasswordResetToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePasswordResetToken", reflect.TypeOf((*MockStore)(nil).CreatePasswordResetToken), arg0, arg1)
+}
+
 // CreatePayments mocks base method.
 func (m *MockStore) CreatePayments(arg0 context.Context, arg1 db.CreatePaymentsParams) (db.Payment, error) {
 	m.ctrl.T.Helper()
@@ -484,6 +499,36 @@ func (mr *MockStoreMockRecorder) GetOrdersForUpdate(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrdersForUpdate", reflect.TypeOf((*MockStore)(nil).GetOrdersForUpdate), arg0, arg1)
 }
 
+// GetPasswordResetToken mocks base method.
+func (m *MockStore) GetPasswordResetToken(arg0 context.Context, arg1 uuid.UUID) (db.PasswordResetToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPasswordResetToken", arg0, arg1)
+	ret0, _ := ret[0].(db.PasswordResetToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPasswordResetToken indicates an expected call of GetPasswordResetToken.
+func (mr *MockStoreMockRecorder) GetPasswordResetToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordResetToken", reflect.TypeOf((*MockStore)(nil).GetPasswordResetToken), arg0, arg1)
+}
+
+// GetPasswordResetTokenByToken mocks base method.
+func (m *MockStore) GetPasswordResetTokenByToken(arg0 context.Context, arg1 string) (db.PasswordResetToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPasswordResetTokenByToken", arg0, arg1)
+	ret0, _ := ret[0].(db.PasswordResetToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPasswordResetTokenByToken indicates an expected call of GetPasswordResetTokenByToken.
+func (mr *MockStoreMockRecorder) GetPasswordResetTokenByToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordResetTokenByToken", reflect.TypeOf((*MockStore)(nil).GetPasswordResetTokenByToken), arg0, arg1)
+}
+
 // GetPayment mocks base method.
 func (m *MockStore) GetPayment(arg0 context.Context, arg1 string) (db.Payment, error) {
 	m.ctrl.T.Helper()
@@ -722,4 +767,19 @@ func (m *MockStore) UpdateProducts(arg0 context.Context, arg1 db.UpdateProductsP
 func (mr *MockStoreMockRecorder) UpdateProducts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProducts", reflect.TypeOf((*MockStore)(nil).UpdateProducts), arg0, arg1)
+}
+
+// UpdateUserPassword mocks base method.
+func (m *MockStore) UpdateUserPassword(arg0 context.Context, arg1 db.UpdateUserPasswordParams) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserPassword", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUserPassword indicates an expected call of UpdateUserPassword.
+func (mr *MockStoreMockRecorder) UpdateUserPassword(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPassword", reflect.TypeOf((*MockStore)(nil).UpdateUserPassword), arg0, arg1)
 }

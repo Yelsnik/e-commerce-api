@@ -29,12 +29,17 @@ func TestCreateOrderTx(t *testing.T) {
 		user, errU := testStore.GetUser(context.Background(), cart.UserID)
 		require.NoError(t, errU)
 
+		payment := createNewPayment(t, user)
+
 		arg := OrderTxParams{
+			PaymentIntent:   payment.ID,
 			UserName:        user.Name,
 			UserID:          user.ID,
 			TotalPrice:      cartItem.SubTotal,
 			DeliveryAddress: util.RandomString(8),
 			Country:         util.RandomCountry(),
+			PaymentStatus:   "succeeded",
+			OrderStatus:     "processing",
 		}
 
 		errs := make(chan error, 1)

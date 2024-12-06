@@ -118,30 +118,18 @@ func (q *Queries) GetOrdersForUpdate(ctx context.Context, id uuid.UUID) (Order, 
 
 const updateOrders = `-- name: UpdateOrders :one
 UPDATE orders
-  set total_price = $2,
-  delivery_address = $3,
-  country = $4,
-  status = $5
+  set status = $2
 WHERE id = $1
 RETURNING id, user_name, user_id, total_price, delivery_address, country, status, created_at
 `
 
 type UpdateOrdersParams struct {
-	ID              uuid.UUID `json:"id"`
-	TotalPrice      float64   `json:"total_price"`
-	DeliveryAddress string    `json:"delivery_address"`
-	Country         string    `json:"country"`
-	Status          string    `json:"status"`
+	ID     uuid.UUID `json:"id"`
+	Status string    `json:"status"`
 }
 
 func (q *Queries) UpdateOrders(ctx context.Context, arg UpdateOrdersParams) (Order, error) {
-	row := q.db.QueryRowContext(ctx, updateOrders,
-		arg.ID,
-		arg.TotalPrice,
-		arg.DeliveryAddress,
-		arg.Country,
-		arg.Status,
-	)
+	row := q.db.QueryRowContext(ctx, updateOrders, arg.ID, arg.Status)
 	var i Order
 	err := row.Scan(
 		&i.ID,

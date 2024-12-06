@@ -17,6 +17,7 @@ type Querier interface {
 	CreateImages(ctx context.Context, arg CreateImagesParams) (Image, error)
 	CreateOrderitems(ctx context.Context, arg CreateOrderitemsParams) (Orderitem, error)
 	CreateOrders(ctx context.Context, arg CreateOrdersParams) (Order, error)
+	CreatePasswordResetToken(ctx context.Context, arg CreatePasswordResetTokenParams) (PasswordResetToken, error)
 	CreatePayments(ctx context.Context, arg CreatePaymentsParams) (Payment, error)
 	CreateProducts(ctx context.Context, arg CreateProductsParams) (Product, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
@@ -39,6 +40,8 @@ type Querier interface {
 	GetOrdersByID(ctx context.Context, id uuid.UUID) (Order, error)
 	GetOrdersByUserID(ctx context.Context, userID uuid.UUID) (Order, error)
 	GetOrdersForUpdate(ctx context.Context, id uuid.UUID) (Order, error)
+	GetPasswordResetToken(ctx context.Context, id uuid.UUID) (PasswordResetToken, error)
+	GetPasswordResetTokenByToken(ctx context.Context, token string) (PasswordResetToken, error)
 	GetPayment(ctx context.Context, id string) (Payment, error)
 	GetPaymentsByUserID(ctx context.Context, userID uuid.UUID) (Payment, error)
 	GetProductForUpdate(ctx context.Context, id uuid.UUID) (Product, error)
@@ -53,6 +56,7 @@ type Querier interface {
 	UpdateOrders(ctx context.Context, arg UpdateOrdersParams) (Order, error)
 	UpdatePaymentStatus(ctx context.Context, arg UpdatePaymentStatusParams) (Payment, error)
 	UpdateProducts(ctx context.Context, arg UpdateProductsParams) (Product, error)
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

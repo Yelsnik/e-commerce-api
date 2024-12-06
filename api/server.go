@@ -43,6 +43,7 @@ func (server *Server) setUpRouter() {
 	authRoutes.POST("/v1/remove-cart-item/:id", server.removeCartItemApi)
 	authRoutes.POST("v1/checkout/:id", server.checkout)
 
+	router.POST("/v1/forgot-password", server.forgotPassword)
 	router.POST("/v1/webhook", server.stripeWebhook)
 	router.GET("/v1/product/:id", server.getProduct)
 	router.POST("/v1/images/:pid", server.uploadImage)

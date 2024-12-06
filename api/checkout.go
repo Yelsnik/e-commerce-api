@@ -40,7 +40,6 @@ func (server *Server) createStripeCustomer(userName, userEmail string) (*stripe.
 
 	for i := 0; i < len(data); i++ {
 		if data[i].Email == userEmail {
-			fmt.Println(data[i])
 			return data[i], nil
 		}
 	}

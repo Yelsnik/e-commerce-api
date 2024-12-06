@@ -22,6 +22,7 @@ type OrderTxParams struct {
 	DeliveryAddress string    `json:"delivery_address"`
 	Country         string    `json:"country"`
 	PaymentStatus   string    `json:"status"`
+	OrderStatus     string    `json:"order_status"`
 }
 
 func (store *SQLStore) CreateOrderTx(ctx context.Context, cartID, cartItemID uuid.UUID, arg OrderTxParams) (OrderTxResult, error) {
@@ -52,6 +53,7 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, cartID, cartItemID uui
 			TotalPrice:      arg.TotalPrice,
 			DeliveryAddress: arg.DeliveryAddress,
 			Country:         arg.Country,
+			Status:          arg.OrderStatus,
 		})
 		if err != nil {
 			return err

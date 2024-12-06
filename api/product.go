@@ -19,6 +19,8 @@ type createProductRequest struct {
 	CountInStock int64   `json:"count_in_stock" binding:"required"`
 	Price        float64 `json:"price" binding:"required"`
 	Currency     string  `json:"currency" binding:"required,currency"`
+	Rating       int64   `json:"rating"`
+	IsFeatured   bool    `json:"is_featured"`
 }
 
 type ProductResponse struct {
@@ -50,6 +52,8 @@ func (server *Server) createProduct(ctx *gin.Context) {
 		CountInStock: req.CountInStock,
 		Price:        req.Price,
 		Currency:     req.Currency,
+		Rating:       util.NewNullInt(req.Rating),
+		IsFeatured:   util.NewNullBool(req.IsFeatured),
 		UserID:       authPayload.User_ID,
 	}
 
@@ -59,9 +63,10 @@ func (server *Server) createProduct(ctx *gin.Context) {
 		return
 	}
 
-	response := newProductResponse(product)
+	//response := newProductResponse(product)
 
-	success(ctx, response)
+	//success(ctx, response)
+	ctx.JSON(http.StatusOK, gin.H{"data": product})
 }
 
 type getProductRequest struct {

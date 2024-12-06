@@ -21,9 +21,6 @@ FOR NO KEY UPDATE;
 
 -- name: UpdateOrders :one
 UPDATE orders
-  set total_price = $2,
-  delivery_address = $3,
-  country = $4,
-  status = $5
+  set status = $2
 WHERE id = $1
 RETURNING *;

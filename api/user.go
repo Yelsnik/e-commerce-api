@@ -2,10 +2,12 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
 	db "github.com/Yelsnik/e-commerce-api/db/sqlc"
+	"github.com/Yelsnik/e-commerce-api/mail"
 	"github.com/Yelsnik/e-commerce-api/util"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -111,7 +113,7 @@ func (server *Server) login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := server.tokenMaker.CreateToken(
+	accessToken, _, err := server.tokenMaker.CreateToken(
 		user.ID,
 		user.Role,
 		server.config.AccessTokenDuration,
@@ -125,4 +127,106 @@ func (server *Server) login(ctx *gin.Context) {
 
 	success(ctx, response)
 
+}
+
+type forgotPasswordRequest struct {
+	Email string `json:"email"`
+}
+
+func (server *Server) forgotPassword(ctx *gin.Context) {
+	var req forgotPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUserByEmail(ctx, req.Email)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	resetToken, payload, err := server.tokenMaker.CreateToken(user.ID, user.Role, server.config.PasswordResetTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.CreatePasswordResetTokenParams{
+		UserID:    user.ID,
+		Token:     resetToken,
+		ExpiresAt: payload.ExpiredAt,
+	}
+
+	_, err = server.store.CreatePasswordResetToken(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	resetLink := fmt.Sprintf("localhost/v1/forgot-password?token=%s", resetToken)
+
+	sender := mail.NewGmailSender(server.config.EmailSenderName, server.config.EmailSenderAddress, server.config.EmailSenderPassword)
+
+	subject := "Reset your password"
+
+	content := fmt.Sprintf(
+		`
+	<h1> Reset password link </h1>
+	<p> click this link to reset password <a href=%s>link<a/> </p>
+	`, resetLink)
+
+	to := []string{user.Email}
+
+	attachFiles := []string{}
+
+	err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "password reset link sent succesfully"})
+}
+
+type resetPasswordRequest struct {
+	ResetToken string `json:"reset_token"`
+	Password   string `json:"password"`
+}
+
+func (server *Server) resetPassword(ctx *gin.Context) {
+	var req resetPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	_, err := server.tokenMaker.VerifyToken(req.ResetToken)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	passwordResetToken, err := server.store.GetPasswordResetTokenByToken(ctx, req.ResetToken)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	hashedPassword, err := util.HashPassword(req.Password)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.UpdateUserPassword(ctx, db.UpdateUserPasswordParams{
+		ID:       passwordResetToken.UserID,
+		Password: hashedPassword,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "successfully updated password", "data": user})
 }
