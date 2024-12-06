@@ -51,6 +51,20 @@ jobs:
       with:
         go-version: '1.23.2'
 
+    - name: Set up environment file
+      run: |
+        echo "DB_SOURCE=${{ secrets.DB_SOURCE}}" >> app.env
+        echo "DB_DRIVER=${{ secrets.DB_DRIVER }}" >> app.env
+        echo "SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }}" >> app.env
+        echo "TOKEN_SYMMETRIC_KEY=${{ secrets.TOKEN_SYMMETRIC_KEY}}" >> app.env
+        echo "ACCESS_TOKEN_DURATION=${{ secrets.ACCESS_TOKEN_DURATION }}" >> app.env
+        echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> app.env
+        echo "WEBHOOK_SIGNING_KEY=${{ secrets.WEBHOOK_SIGNING_KEY}}" >> app.env
+        echo "EMAIL_SENDER_NAME=${{ secrets.EMAIL_SENDER_NAME }}" >> app.env
+        echo "EMAIL_SENDER_ADDRESS=${{ secrets.EMAIL_SENDER_ADDRESS }}" >> app.env
+        echo "EMAIL_SENDER_PASSWORD=${{ secrets.EMAIL_SENDER_PASSWORD }}" >> app.env
+        echo "PASSWORD_RESET_TOKEN_DURATION=${{ secrets.PASSWORD_RESET_TOKEN_DURATION }}" >> app.env
+
     - name: Test
       run: make test
   
